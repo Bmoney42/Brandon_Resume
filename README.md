@@ -4,6 +4,19 @@
 
 ---
 
+## Progress
+
+- S3 bucket created
+- Static website hosting enabled
+- `index.html` and `styles.css` uploaded
+- Bucket policy configured for public read
+- Website successfully deployed and accessible
+- Verified site loads from S3 website endpoint
+- Added JavaScript support (optional expansion)
+- Began CloudFront setup
+
+---
+
 ## S3 Static Website Setup
 
 ### Setup
