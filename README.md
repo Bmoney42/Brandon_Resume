@@ -8,6 +8,7 @@
 
 - S3 bucket created
 - Static website hosting enabled
+-   http://resume-challenge-brandon.s3-website-us-east-1.amazonaws.com/
 - `index.html` and `styles.css` uploaded
 - Bucket policy configured for public read
 - Website successfully deployed and accessible
