@@ -2,6 +2,10 @@
 
 ## AWS Resume Challenge
 
+---
+
+## S3 Static Website Setup
+
 ### Setup
 
 - Use VS Code to create:
@@ -15,7 +19,7 @@
 
 ---
 
-## Permissions
+## Permissions Configuration
 
 ### Block Public Access (Bucket Settings)
 
@@ -31,7 +35,9 @@ Set the following:
 
 ## Bucket Policy
 
-Apply the following policy to allow public read access:
+### Public Read Access
+
+Apply the following policy:
 
 ```json
 {
