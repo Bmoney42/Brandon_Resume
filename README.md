@@ -6,63 +6,83 @@
 
 ## Progress
 
-- S3 bucket created
-- Static website hosting enabled
--   http://resume-challenge-brandon.s3-website-us-east-1.amazonaws.com/
-- `index.html` and `styles.css` uploaded
-- Bucket policy configured for public read
-- Website successfully deployed and accessible
-- Verified site loads from S3 website endpoint
-- Added JavaScript support (optional expansion)
-- Began CloudFront setup
+- S3 bucket created (private origin)
+- Static website files uploaded (`index.html`, `styles.css`)
+- Server-side encryption enabled (SSE-S3)
+- Removed public access from S3 bucket
+- Configured S3 as **CloudFront origin**
+- CloudFront distribution created
+- HTTPS enabled via CloudFront
+- Site successfully deployed and accessible through CloudFront URL
+- Verified secure access (no direct S3 website endpoint exposure)
+- Added JavaScript support (frontend ready for API integration)
 
 ---
 
-## S3 Static Website Setup
+## Architecture
 
-### Setup
+- **S3** → private storage (origin only)
+- **CloudFront** → public access layer (HTTPS)
+- **Viewer access** → only through CloudFront
 
-- Use VS Code to create:
+---
+
+## S3 Setup (Private Origin)
+
+### Configuration
+
+- Bucket created for static assets
+- Files uploaded:
   - `index.html`
   - `styles.css`
-- Create an S3 bucket in AWS
-- Upload both files to the bucket (Objects tab)
-- Enable static website hosting
-- Enable server-side encryption:
+- Static website hosting **not used for public access**
+- Server-side encryption enabled:
   - Amazon S3 managed keys (**SSE-S3**)
 
 ---
 
-## Permissions Configuration
+## S3 Security
 
-### Block Public Access (Bucket Settings)
+### Block Public Access
 
-Set the following:
+All public access remains **ON**
 
-- Block all public access → **OFF**
-  - Block public access to buckets and objects granted through new ACLs → **OFF**
-  - Block public access to buckets and objects granted through any ACLs → **ON**
-  - Block public access through new public bucket or access point policies → **OFF**
-  - Block public and cross-account access through any public bucket or access point policies → **OFF**
+- Block public access to buckets and objects granted through new ACLs → **ON**
+- Block public access to buckets and objects granted through any ACLs → **ON**
+- Block public access through new public bucket policies → **ON**
+- Block public and cross-account access through any public policies → **ON**
+
+No public bucket policy applied.
 
 ---
 
-## Bucket Policy
+## CloudFront Setup
 
-### Public Read Access
+### Distribution Configuration
 
-Apply the following policy:
+- Origin: S3 bucket
+- Viewer protocol policy: **Redirect HTTP → HTTPS**
+- Default root object: `index.html`
 
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "PublicReadGetObject",
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::resume-challenge-brandon/*"
-    }
-  ]
-}
+### Access Control
+
+- S3 access restricted to CloudFront using **Origin Access Control (OAC)**
+- Direct S3 access blocked
+
+---
+
+## Deployment Result
+
+- Site accessible via CloudFront domain (HTTPS)
+- S3 bucket is no longer publicly reachable
+- Architecture follows production pattern (CDN in front of private origin)
+
+---
+
+## Next Steps
+
+- DynamoDB visitor counter
+- Lambda function integration
+- API Gateway endpoint
+- Frontend API call for live counter
+- CI/CD pipeline (GitHub Actions)
