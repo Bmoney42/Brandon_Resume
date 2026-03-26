@@ -6,24 +6,26 @@
 
 ## Progress
 
-- S3 bucket created (private origin)
-- Static website files uploaded (`index.html`, `styles.css`)
-- Server-side encryption enabled (SSE-S3)
-- Removed public access from S3 bucket
-- Configured S3 as **CloudFront origin**
-- CloudFront distribution created
-- HTTPS enabled via CloudFront
-- Site successfully deployed and accessible through CloudFront URL
-- Verified secure access (no direct S3 website endpoint exposure)
-- Added JavaScript support (frontend ready for API integration)
+- Created S3 bucket for static site storage
+- Uploaded `index.html` and `styles.css`
+- Enabled server-side encryption (SSE-S3)
+- Kept **Block All Public Access = ON**
+- Removed all public bucket access patterns
+- Configured S3 as a **private origin**
+- Created CloudFront distribution
+- Enabled HTTPS delivery through CloudFront
+- Configured **Origin Access Control (OAC)**
+- Applied secure bucket policy to allow **only CloudFront access**
+- Verified site loads successfully via CloudFront (not S3)
+- Added frontend JavaScript support (ready for backend integration)
 
 ---
 
 ## Architecture
 
-- **S3** → private storage (origin only)
-- **CloudFront** → public access layer (HTTPS)
-- **Viewer access** → only through CloudFront
+- **Amazon S3** → Private storage (origin)
+- **Amazon CloudFront** → Public CDN (HTTPS entry point)
+- **Viewer Access** → Only through CloudFront
 
 ---
 
@@ -31,13 +33,13 @@
 
 ### Configuration
 
-- Bucket created for static assets
-- Files uploaded:
+- Created S3 bucket for static assets
+- Uploaded:
   - `index.html`
   - `styles.css`
-- Static website hosting **not used for public access**
 - Server-side encryption enabled:
   - Amazon S3 managed keys (**SSE-S3**)
+- Static website endpoint **not used**
 
 ---
 
@@ -45,44 +47,36 @@
 
 ### Block Public Access
 
-All public access remains **ON**
+All public access is fully **enabled (blocked)**
 
 - Block public access to buckets and objects granted through new ACLs → **ON**
 - Block public access to buckets and objects granted through any ACLs → **ON**
 - Block public access through new public bucket policies → **ON**
 - Block public and cross-account access through any public policies → **ON**
 
-No public bucket policy applied.
-
 ---
 
-## CloudFront Setup
+### Bucket Policy (CloudFront Only Access)
 
-### Distribution Configuration
+Only CloudFront is allowed to read objects from S3:
 
-- Origin: S3 bucket
-- Viewer protocol policy: **Redirect HTTP → HTTPS**
-- Default root object: `index.html`
-
-### Access Control
-
-- S3 access restricted to CloudFront using **Origin Access Control (OAC)**
-- Direct S3 access blocked
-
----
-
-## Deployment Result
-
-- Site accessible via CloudFront domain (HTTPS)
-- S3 bucket is no longer publicly reachable
-- Architecture follows production pattern (CDN in front of private origin)
-
----
-
-## Next Steps
-
-- DynamoDB visitor counter
-- Lambda function integration
-- API Gateway endpoint
-- Frontend API call for live counter
-- CI/CD pipeline (GitHub Actions)
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudFrontOnly",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudfront.amazonaws.com"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::resume-challenge-brandon/*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceArn": "arn:aws:cloudfront::517392056455:distribution/ECCFQ175D2EWH"
+        }
+      }
+    }
+  ]
+}
